@@ -1,3 +1,4 @@
+import 'package:container_ship/domain/entities/entities.dart';
 import 'package:container_ship/presentation/state/providers/providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -16,10 +17,19 @@ class ContainerCreationPageState extends ConsumerState<ContainerCreationPage> {
   final _portsController = TextEditingController();
   final _volumeController = TextEditingController();
   final _envController = TextEditingController();
+  DockerImage? _selectedImage;
   bool _isLoading = false;
 
   @override
+  void initState() {
+    super.initState();
+    ref.read(imageListNotifierProvider.notifier).getImages();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final imageList = ref.watch(imageListNotifierProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Create Docker Container'),
@@ -43,8 +53,22 @@ class ContainerCreationPageState extends ConsumerState<ContainerCreationPage> {
                         return null;
                       },
                     ),
+                    DropdownButton(
+                      value: _selectedImage,
+                      selectedItemBuilder: (context) => imageList
+                          .map((image) => Text('${image.name}:${image.tag}'))
+                          .toList(),
+                      items: imageList.map((image) {
+                        return DropdownMenuItem(
+                          value: image,
+                          child: Text('${image.name}:${image.tag}'),
+                        );
+                      }).toList(),
+                      onChanged: _onImageSelected,
+                    ),
                     TextFormField(
                       controller: _imageController,
+                      enabled: false,
                       decoration: const InputDecoration(labelText: 'Image'),
                       validator: (value) {
                         if (value!.isEmpty) {
@@ -103,6 +127,14 @@ class ContainerCreationPageState extends ConsumerState<ContainerCreationPage> {
     );
   }
 
+  void _onImageSelected(DockerImage? image) {
+    if (image != null) {
+      _imageController.text = '${image.name}:${image.tag}';
+      _nameController.text = image.name;
+      _selectedImage = image;
+    }
+  }
+
   void _createContainer() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
@@ -121,7 +153,9 @@ class ContainerCreationPageState extends ConsumerState<ContainerCreationPage> {
             image: image,
             ports: ports?.contains(',') ?? false
                 ? ports?.split(',').map(int.parse).toList()
-                : [int.parse(ports!)],
+                : ports == null
+                    ? null
+                    : [int.parse(ports)],
             volume: volume.isEmpty ? null : volume,
             environment: env.isEmpty
                 ? null
