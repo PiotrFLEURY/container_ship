@@ -53,4 +53,12 @@ abstract class DockerApi {
   // https://docs.docker.com/engine/api/v1.43/#operation/ContainerDelete
   @DELETE('/containers/{id}')
   Future<void> removeContainer(@Path('id') String id);
+
+  // List images
+  // GET /images/json
+  // https://docs.docker.com/engine/api/v1.43/#operation/ImageList
+  @GET('/images/json')
+  Future<List<DockerImage>> getImages({
+    @Query('all') bool all = true,
+  });
 }
