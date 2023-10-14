@@ -1,5 +1,4 @@
-import 'package:container_ship/data/models/docker_container.dart';
-import 'package:container_ship/data/models/docker_container_stats.dart';
+import 'package:container_ship/data/models/models.dart';
 import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
 
@@ -32,4 +31,26 @@ abstract class DockerApi {
     @Query('follow') bool follow = false,
     @Query('tail') String tail = 'all',
   });
+
+  // Create a new container
+  // POST /containers/create
+  // https://docs.docker.com/engine/api/v1.43/#operation/ContainerCreate
+  @POST('/containers/create')
+  Future<void> createContainer({
+    @Header('content-type') String contentType = 'application/json',
+    @Query('name') String? name,
+    @Body() required DockerContainerCreationRequest body,
+  });
+
+  // Start a container
+  // POST /containers/{id}/start
+  // https://docs.docker.com/engine/api/v1.43/#operation/ContainerStart
+  @POST('/containers/{id}/start')
+  Future<void> startContainer(@Path('id') String id);
+
+  // Remove a container
+  // DELETE /containers/{id}
+  // https://docs.docker.com/engine/api/v1.43/#operation/ContainerDelete
+  @DELETE('/containers/{id}')
+  Future<void> removeContainer(@Path('id') String id);
 }

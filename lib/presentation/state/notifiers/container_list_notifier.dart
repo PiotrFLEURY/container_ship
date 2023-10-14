@@ -23,4 +23,31 @@ class ContainerListNotifier extends StateNotifier<List<DockerContainer>> {
     await _containerRepository.stopContainer(id);
     getContainers();
   }
+
+  Future<void> createContainer({
+    required String name,
+    required String image,
+    String? volume,
+    List<int>? ports,
+    Map<String, String>? environment,
+  }) async {
+    await _containerRepository.createContainer(
+      name: name,
+      image: image,
+      volume: volume,
+      ports: ports,
+      environment: environment,
+    );
+    getContainers();
+  }
+
+  Future<void> startContainer(String id) async {
+    await _containerRepository.startContainer(id);
+    getContainers();
+  }
+
+  Future<void> removeContainer(String id) async {
+    await _containerRepository.removeContainer(id);
+    getContainers();
+  }
 }

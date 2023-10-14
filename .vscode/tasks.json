@@ -1,0 +1,17 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build nginx docker image",
+            "type": "shell",
+            "command": "sudo docker build -t docker_nginx docker_nginx",
+            "group": "build"
+        },
+        {
+            "label": "start nginx docker container",
+            "type": "shell",
+            "command": "sudo docker run -d -p 80:80 -v /var/run:/var/run --rm --name docker_nginx docker_nginx",
+            "group": "none"
+        }
+    ]
+}
