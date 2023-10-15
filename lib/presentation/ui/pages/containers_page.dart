@@ -1,6 +1,7 @@
 import 'package:container_ship/domain/entities/entities.dart';
 import 'package:container_ship/presentation/state/providers/providers.dart';
 import 'package:container_ship/presentation/ui/pages/log_page.dart';
+import 'package:container_ship/presentation/ui/views/background.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -30,7 +31,9 @@ class _ContainersPageState extends ConsumerState<ContainersPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Containers'),
+        title: const Center(
+          child: Text('Containers'),
+        ),
         actions: [
           // refresh
           IconButton(
@@ -41,7 +44,7 @@ class _ContainersPageState extends ConsumerState<ContainersPage> {
           ),
           // search
           IconButton(
-            onPressed: () => Navigator.of(context).pushNamed('/search'),
+            onPressed: _search,
             icon: const Icon(Icons.search),
           ),
         ],
@@ -50,80 +53,81 @@ class _ContainersPageState extends ConsumerState<ContainersPage> {
         onPressed: _createContainer,
         child: const Icon(Icons.add),
       ),
-      body: RefreshIndicator(
-        triggerMode: RefreshIndicatorTriggerMode.onEdge,
-        onRefresh: () =>
-            ref.read(containerListNotifierProvider.notifier).getContainers(),
-        child: ListView.builder(
-          itemCount: containers.length,
-          itemBuilder: (context, index) {
-            final container = containers[index];
-            return Card(
-              child: ListTile(
-                title: Text('${container.image} (${container.id})'),
-                subtitle: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    Text(container.state),
-                    InkWell(
-                      onTap: () => seeLogs(context, ref, container.id),
-                      child: const Icon(
-                        Icons.text_snippet_rounded,
-                        color: Colors.blue,
+      body: Background(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: ListView.builder(
+            itemCount: containers.length,
+            itemBuilder: (context, index) {
+              final container = containers[index];
+              return Card(
+                child: ListTile(
+                  title: Text('${container.image} (${container.id})'),
+                  subtitle: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Text(container.state),
+                      InkWell(
+                        onTap: () => seeLogs(context, ref, container.id),
+                        child: const Icon(
+                          Icons.text_snippet_rounded,
+                          color: Colors.blue,
+                        ),
                       ),
-                    ),
+                      container.state == 'running'
+                          ? InkWell(
+                              onTap: () => ref
+                                  .read(containerListNotifierProvider.notifier)
+                                  .stopContainer(container.id),
+                              child: const Icon(
+                                Icons.stop_circle_rounded,
+                                color: Colors.red,
+                                size: 32,
+                              ),
+                            )
+                          : InkWell(
+                              onTap: () => ref
+                                  .read(containerListNotifierProvider.notifier)
+                                  .startContainer(container.id),
+                              child: const Icon(
+                                Icons.play_circle_rounded,
+                                color: Colors.green,
+                                size: 32,
+                              ),
+                            ),
+                      InkWell(
+                        onTap: () => ref
+                            .read(containerListNotifierProvider.notifier)
+                            .removeContainer(container.id),
+                        child: const Icon(
+                          Icons.delete_rounded,
+                          color: Colors.red,
+                          size: 32,
+                        ),
+                      ),
+                    ],
+                  ),
+                  leading: Icon(
                     container.state == 'running'
-                        ? InkWell(
-                            onTap: () => ref
-                                .read(containerListNotifierProvider.notifier)
-                                .stopContainer(container.id),
-                            child: const Icon(
-                              Icons.stop_circle_rounded,
-                              color: Colors.red,
-                              size: 32,
-                            ),
-                          )
-                        : InkWell(
-                            onTap: () => ref
-                                .read(containerListNotifierProvider.notifier)
-                                .startContainer(container.id),
-                            child: const Icon(
-                              Icons.play_circle_rounded,
-                              color: Colors.green,
-                              size: 32,
-                            ),
-                          ),
-                    InkWell(
-                      onTap: () => ref
-                          .read(containerListNotifierProvider.notifier)
-                          .removeContainer(container.id),
-                      child: const Icon(
-                        Icons.delete_rounded,
-                        color: Colors.red,
-                        size: 32,
-                      ),
+                        ? Icons.play_arrow
+                        : Icons.close_rounded,
+                    color: container.state == 'running'
+                        ? Colors.green
+                        : Colors.red,
+                  ),
+                  trailing: InkWell(
+                    onTap: () => ref
+                        .read(containerListNotifierProvider.notifier)
+                        .getContainerStats(container.id),
+                    child: Text(
+                      containerStatsSummary(container.stats),
                     ),
-                  ],
-                ),
-                leading: Icon(
-                  container.state == 'running'
-                      ? Icons.play_arrow
-                      : Icons.close_rounded,
-                  color:
-                      container.state == 'running' ? Colors.green : Colors.red,
-                ),
-                trailing: InkWell(
-                  onTap: () => ref
-                      .read(containerListNotifierProvider.notifier)
-                      .getContainerStats(container.id),
-                  child: Text(
-                    containerStatsSummary(container.stats),
                   ),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         ),
       ),
     );
@@ -152,5 +156,12 @@ class _ContainersPageState extends ConsumerState<ContainersPage> {
 
   void _createContainer() {
     Navigator.of(context).pushNamed('/create');
+  }
+
+  Future<void> _search() async {
+    final imageName = await Navigator.of(context).pushNamed('/search');
+    if (mounted && imageName != null) {
+      Navigator.of(context).pushNamed('/create', arguments: imageName);
+    }
   }
 }

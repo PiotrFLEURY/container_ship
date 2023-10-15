@@ -13,6 +13,8 @@ class LogPage extends ConsumerWidget {
         title: const Text('Logs'),
       ),
       body: Container(
+        width: double.infinity,
+        height: double.infinity,
         decoration: BoxDecoration(
           color: Colors.black,
           borderRadius: BorderRadius.circular(8),
@@ -20,6 +22,7 @@ class LogPage extends ConsumerWidget {
         margin: const EdgeInsets.all(16),
         padding: const EdgeInsets.all(16),
         child: SingleChildScrollView(
+          reverse: true,
           child: SelectableText(
             logs,
             style: const TextStyle(
