@@ -1,5 +1,6 @@
 import 'package:container_ship/presentation/ui/pages/container_creation_page.dart';
 import 'package:container_ship/presentation/ui/pages/containers_page.dart';
+import 'package:container_ship/presentation/ui/pages/image_search_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -27,6 +28,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => const ContainersPage(),
         '/create': (context) => const ContainerCreationPage(),
+        '/search': (context) => const ImageSearchPage(),
       },
     );
   }

@@ -24,4 +24,19 @@ class ImageRepositoryImpl implements ImageRepository {
           }).toList(),
         );
   }
+
+  @override
+  Future<List<entity.DockerImageSearchResult>> searchImages(String term) {
+    return _dockerApi.searchImages(term: term).then(
+          (images) => images.map((image) {
+            return entity.DockerImageSearchResult(
+              description: image.description,
+              isOfficial: image.isOfficial,
+              isAutomated: image.isAutomated,
+              name: image.name,
+              starCount: image.starCount,
+            );
+          }).toList(),
+        );
+  }
 }

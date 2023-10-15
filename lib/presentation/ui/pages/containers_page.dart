@@ -32,11 +32,17 @@ class _ContainersPageState extends ConsumerState<ContainersPage> {
       appBar: AppBar(
         title: const Text('Containers'),
         actions: [
+          // refresh
           IconButton(
             onPressed: () => ref
                 .read(containerListNotifierProvider.notifier)
                 .getContainers(),
             icon: const Icon(Icons.refresh),
+          ),
+          // search
+          IconButton(
+            onPressed: () => Navigator.of(context).pushNamed('/search'),
+            icon: const Icon(Icons.search),
           ),
         ],
       ),
