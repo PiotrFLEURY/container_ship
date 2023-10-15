@@ -16,10 +16,10 @@ Read [docker_socket_nginx README](docker_socket_nginx/README.md)
 
 ## Target features
 
-- [] List images
-- [] List running containers
-- [] Get container stats
-- [] Get container logs
-- [] Start a container
-- [] Stop a container
-- [] Restart a container
+- [ ] List images
+- [ ] List running containers
+- [ ] Get container stats
+- [ ] Get container logs
+- [ ] Start a container
+- [ ] Stop a container
+- [ ] Restart a container

@@ -61,4 +61,14 @@ abstract class DockerApi {
   Future<List<DockerImage>> getImages({
     @Query('all') bool all = true,
   });
+
+  // Search images
+  // GET /images/search
+  // https://docs.docker.com/engine/api/v1.43/#operation/ImageSearch
+  @GET('/images/search')
+  Future<List<DockerImageSearchResult>> searchImages({
+    @Query('term') String term = '',
+    @Query('limit') int? limit,
+    @Query('filters') Map<String, String>? filters,
+  });
 }
