@@ -11,4 +11,8 @@ class ImageListNotifier extends StateNotifier<List<DockerImage>> {
     final images = await _imageRepository.getImages();
     state = images;
   }
+
+  void pullImage({required String name}) {
+    _imageRepository.pullImage(name);
+  }
 }

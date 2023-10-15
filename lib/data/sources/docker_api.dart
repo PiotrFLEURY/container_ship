@@ -71,4 +71,16 @@ abstract class DockerApi {
     @Query('limit') int? limit,
     @Query('filters') Map<String, String>? filters,
   });
+
+  // Pull an image
+  // POST /images/create
+  // https://docs.docker.com/engine/api/v1.43/#operation/ImageCreate
+  @POST('/images/create')
+  Future<void> pullImage({
+    @Query('fromImage') String? fromImage,
+    @Query('fromSrc') String? fromSrc,
+    @Query('repo') String? repo,
+    @Query('tag') String? tag,
+    @Query('registry') String? registry,
+  });
 }

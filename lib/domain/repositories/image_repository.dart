@@ -4,4 +4,6 @@ abstract class ImageRepository {
   Future<List<DockerImage>> getImages();
 
   Future<List<DockerImageSearchResult>> searchImages(String term);
+
+  void pullImage(String name);
 }

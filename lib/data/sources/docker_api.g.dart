@@ -292,6 +292,43 @@ class _DockerApi implements DockerApi {
     return value;
   }
 
+  @override
+  Future<void> pullImage({
+    String? fromImage,
+    String? fromSrc,
+    String? repo,
+    String? tag,
+    String? registry,
+  }) async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{
+      r'fromImage': fromImage,
+      r'fromSrc': fromSrc,
+      r'repo': repo,
+      r'tag': tag,
+      r'registry': registry,
+    };
+    queryParameters.removeWhere((k, v) => v == null);
+    final _headers = <String, dynamic>{};
+    final Map<String, dynamic>? _data = null;
+    await _dio.fetch<void>(_setStreamType<void>(Options(
+      method: 'POST',
+      headers: _headers,
+      extra: _extra,
+    )
+        .compose(
+          _dio.options,
+          '/images/create',
+          queryParameters: queryParameters,
+          data: _data,
+        )
+        .copyWith(
+            baseUrl: _combineBaseUrls(
+          _dio.options.baseUrl,
+          baseUrl,
+        ))));
+  }
+
   RequestOptions _setStreamType<T>(RequestOptions requestOptions) {
     if (T != dynamic &&
         !(requestOptions.responseType == ResponseType.bytes ||
