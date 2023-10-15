@@ -155,7 +155,8 @@ class _DockerApi implements DockerApi {
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{r'content-type': contentType};
     _headers.removeWhere((k, v) => v == null);
-    final _data = body;
+    final _data = <String, dynamic>{};
+    _data.addAll(body.toJson());
     await _dio.fetch<void>(_setStreamType<void>(Options(
       method: 'POST',
       headers: _headers,
