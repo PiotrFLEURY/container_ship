@@ -1,34 +1,55 @@
 import 'package:container_ship/domain/entities/entities.dart';
-import 'package:container_ship/presentation/state/providers/providers.dart';
+import 'package:container_ship/domain/usecases/usecases.dart';
 import 'package:container_ship/presentation/ui/pages/log_page.dart';
 import 'package:container_ship/presentation/ui/views/background.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ContainersPage extends ConsumerStatefulWidget {
+class ContainersPage extends ConsumerWidget {
   const ContainersPage({super.key});
 
   @override
-  ConsumerState<ContainersPage> createState() => _ContainersPageState();
-}
-
-class _ContainersPageState extends ConsumerState<ContainersPage> {
-  @override
-  void initState() {
-    super.initState();
-    ref.read(containerListNotifierProvider.notifier).getContainers();
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(
+    BuildContext context,
+    WidgetRef ref,
+  ) {
     // Scrollable list of running Docker containers shown in Material cards
     // Title is the name of the container followed by the container ID
     // Subtitle is the image name
     // Leading is the container status
     // Trailing is the container stats (CPU, memory)
 
-    final containers = ref.watch(containerListNotifierProvider);
+    final containers = ref.watch(listContainersProvider);
 
+    return containers.when(
+      data: (containerList) {
+        return ContainerListPageContent(
+          containers: containerList,
+        );
+      },
+      error: (_, __) => const Center(child: Text('Error loading containers')),
+      loading: () => const Center(child: CircularProgressIndicator()),
+    );
+  }
+}
+
+class ContainerListPageContent extends ConsumerStatefulWidget {
+  const ContainerListPageContent({
+    Key? key,
+    required this.containers,
+  }) : super(key: key);
+
+  final List<DockerContainer> containers;
+
+  @override
+  ConsumerState<ContainerListPageContent> createState() =>
+      _ContainerListPageContentState();
+}
+
+class _ContainerListPageContentState
+    extends ConsumerState<ContainerListPageContent> {
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Center(
@@ -37,9 +58,7 @@ class _ContainersPageState extends ConsumerState<ContainersPage> {
         actions: [
           // refresh
           IconButton(
-            onPressed: () => ref
-                .read(containerListNotifierProvider.notifier)
-                .getContainers(),
+            onPressed: () => ref.refresh(listContainersProvider.future),
             icon: const Icon(Icons.refresh),
           ),
           // search
@@ -57,9 +76,9 @@ class _ContainersPageState extends ConsumerState<ContainersPage> {
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: ListView.builder(
-            itemCount: containers.length,
+            itemCount: widget.containers.length,
             itemBuilder: (context, index) {
-              final container = containers[index];
+              final container = widget.containers[index];
               return Card(
                 child: ListTile(
                   title: Text('${container.image} (${container.id})'),
@@ -77,9 +96,8 @@ class _ContainersPageState extends ConsumerState<ContainersPage> {
                       ),
                       container.state == 'running'
                           ? InkWell(
-                              onTap: () => ref
-                                  .read(containerListNotifierProvider.notifier)
-                                  .stopContainer(container.id),
+                              onTap: () =>
+                                  ref.read(stopContainerProvider(container.id)),
                               child: const Icon(
                                 Icons.stop_circle_rounded,
                                 color: Colors.red,
@@ -87,9 +105,9 @@ class _ContainersPageState extends ConsumerState<ContainersPage> {
                               ),
                             )
                           : InkWell(
-                              onTap: () => ref
-                                  .read(containerListNotifierProvider.notifier)
-                                  .startContainer(container.id),
+                              onTap: () => ref.read(
+                                startContainerProvider(container.id),
+                              ),
                               child: const Icon(
                                 Icons.play_circle_rounded,
                                 color: Colors.green,
@@ -97,9 +115,9 @@ class _ContainersPageState extends ConsumerState<ContainersPage> {
                               ),
                             ),
                       InkWell(
-                        onTap: () => ref
-                            .read(containerListNotifierProvider.notifier)
-                            .removeContainer(container.id),
+                        onTap: () => ref.read(
+                          removeContainerProvider(container.id),
+                        ),
                         child: const Icon(
                           Icons.delete_rounded,
                           color: Colors.red,
@@ -117,9 +135,11 @@ class _ContainersPageState extends ConsumerState<ContainersPage> {
                         : Colors.red,
                   ),
                   trailing: InkWell(
-                    onTap: () => ref
-                        .read(containerListNotifierProvider.notifier)
-                        .getContainerStats(container.id),
+                    onTap: () async {
+                      //final stats =
+                      //ref.read(containerStatsProvider(container.id));
+                      // TODO use stats
+                    },
                     child: Text(
                       containerStatsSummary(container.stats),
                     ),
@@ -146,10 +166,11 @@ class _ContainersPageState extends ConsumerState<ContainersPage> {
     WidgetRef ref,
     String id,
   ) {
-    ref.read(containerLogsNotifierProvider.notifier).getContainerLogs(id);
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => const LogPage(),
+        builder: (context) => LogPage(
+          containerId: id,
+        ),
       ),
     );
   }

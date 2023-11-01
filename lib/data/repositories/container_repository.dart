@@ -1,6 +1,6 @@
 import 'package:container_ship/data/models/models.dart';
 import 'package:container_ship/data/sources/docker_api.dart';
-import 'package:container_ship/domain/repositories/container_repository.dart';
+import 'package:container_ship/domain/repositories/repositories.dart';
 import 'package:container_ship/domain/entities/entities.dart' as entity;
 
 class ContainerRepositoryImpl implements ContainerRepository {

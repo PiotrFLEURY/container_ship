@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:container_ship/domain/entities/entities.dart';
-import 'package:container_ship/presentation/state/providers/providers.dart';
+import 'package:container_ship/domain/usecases/usecases.dart';
 import 'package:container_ship/presentation/ui/views/background.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -25,12 +25,6 @@ class ContainerCreationPageState extends ConsumerState<ContainerCreationPage> {
   Timer? pullingTimer;
 
   @override
-  void initState() {
-    super.initState();
-    ref.read(imageListNotifierProvider.notifier).getImages();
-  }
-
-  @override
   void dispose() {
     pullingTimer?.cancel();
     super.dispose();
@@ -41,10 +35,18 @@ class ContainerCreationPageState extends ConsumerState<ContainerCreationPage> {
     // get image name from arguments
     final imageName = ModalRoute.of(context)!.settings.arguments as String?;
 
-    final imageList = imageName == null
-        ? ref.watch(imageListNotifierProvider)
-        : const <DockerImage>[];
+    final imageList = ref.watch(listImagesProvider);
 
+    return imageList.when(
+      data: (imageList) {
+        return _body(imageName, imageList);
+      },
+      error: (_, __) => const Center(child: Text('Error loading images')),
+      loading: () => const Center(child: CircularProgressIndicator()),
+    );
+  }
+
+  Widget _body(String? imageName, List<DockerImage> imageList) {
     _nameController.text = imageName ?? '';
     _imageController.text = imageName ?? '';
 
@@ -163,10 +165,9 @@ class ContainerCreationPageState extends ConsumerState<ContainerCreationPage> {
   }
 
   void _pullImage(String name) {
-    ref.read(imageListNotifierProvider.notifier).pullImage(name: name);
+    ref.read(pullImageProvider(name));
     pullingTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
-      await ref.read(imageListNotifierProvider.notifier).getImages();
-      final imageList = ref.read(imageListNotifierProvider);
+      final imageList = await ref.refresh(listImagesProvider.future);
       if (imageList.any((element) => element.name == name)) {
         setState(() {
           _isLoading = false;
@@ -192,26 +193,28 @@ class ContainerCreationPageState extends ConsumerState<ContainerCreationPage> {
       final volume = _volumeController.text;
       final env = _envController.text;
 
-      final imageList = ref.read(imageListNotifierProvider);
+      final imageList = await ref.read(listImagesProvider.future);
       if (!imageList.any((element) => element.name == name)) {
         _pullImage(name);
       } else {
-        await ref.read(containerListNotifierProvider.notifier).createContainer(
-              name: name,
-              image: image,
-              ports: ports?.contains(',') ?? false
-                  ? ports?.split(',').map(int.parse).toList()
-                  : ports == null
-                      ? null
-                      : [int.parse(ports)],
-              volume: volume.isEmpty ? null : volume,
-              environment: env.isEmpty
-                  ? null
-                  : Map.fromIterable(
-                      env.split(','),
-                      key: (e) => e.split('=')[0],
-                    ),
-            );
+        ref.read(
+          createContainerProvider(
+            containerName: name,
+            image: image,
+            ports: ports?.contains(',') ?? false
+                ? ports?.split(',').map(int.parse).toList()
+                : ports == null
+                    ? null
+                    : [int.parse(ports)],
+            volume: volume.isEmpty ? null : volume,
+            environment: env.isEmpty
+                ? null
+                : Map.fromIterable(
+                    env.split(','),
+                    key: (e) => e.split('=')[0],
+                  ),
+          ),
+        );
 
         setState(() {
           _isLoading = false;

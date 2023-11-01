@@ -1,4 +1,4 @@
-import 'package:container_ship/presentation/state/providers/providers.dart';
+import 'package:container_ship/presentation/state_notifiers/image_search_result.dart';
 import 'package:container_ship/presentation/ui/pages/search/views/search_field.dart';
 import 'package:container_ship/presentation/ui/views/background.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +11,7 @@ class SearchPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final searchResult = ref.watch(imageSearchNotifierProvider);
+    final searchResult = ref.watch(imageSearchResultProvider);
 
     return Scaffold(
       body: Background(
@@ -22,7 +22,7 @@ class SearchPage extends ConsumerWidget {
               padding: const EdgeInsets.all(8.0),
               child: IconButton(
                 onPressed: () {
-                  ref.read(imageSearchNotifierProvider.notifier).clearResults();
+                  ref.read(imageSearchResultProvider.notifier).clearResults();
                   Navigator.of(context).pop();
                 },
                 icon: Material(
@@ -43,14 +43,12 @@ class SearchPage extends ConsumerWidget {
                   onSubmitted: (term) {
                     if (term.isNotEmpty) {
                       ref
-                          .read(imageSearchNotifierProvider.notifier)
+                          .read(imageSearchResultProvider.notifier)
                           .searchImages(term);
                     }
                   },
                   onClear: () {
-                    ref
-                        .read(imageSearchNotifierProvider.notifier)
-                        .clearResults();
+                    ref.read(imageSearchResultProvider.notifier).clearResults();
                   },
                 ),
               ),
@@ -99,7 +97,7 @@ class SearchPage extends ConsumerWidget {
     WidgetRef ref,
     String name,
   ) {
-    ref.read(imageSearchNotifierProvider.notifier).clearResults();
+    ref.read(imageSearchResultProvider.notifier).clearResults();
     Navigator.of(context).pop(name);
   }
 }
