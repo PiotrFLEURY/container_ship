@@ -13,7 +13,6 @@ analyzer:
   exclude:
     - "**/*.g.dart"
     - "**/*.freezed.dart"
-    - "**/*.look.dart"
   plugins:
     - custom_lint
 

@@ -6,7 +6,7 @@ part of 'image_search_result.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$imageSearchResultHash() => r'8dfbe3be20b3b4d2feff2fd546e188acbbd6f999';
+String _$imageSearchResultHash() => r'84fa5956dcb186c9df965264642737dfed6ce754';
 
 /// See also [ImageSearchResult].
 @ProviderFor(ImageSearchResult)

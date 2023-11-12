@@ -1,0 +1,38 @@
+name: Container Ship CI
+
+on: [push]
+
+jobs:
+  
+  test:
+    name: Run tests and check coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+
+      - name: Set up very_good_cli
+        run: dart pub global activate very_good_cli
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Run tests and check coverage
+        run: very_good test --coverage --min-coverage 80
+  build-web:
+    name: Build web app
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+
+      - name: Install dependencies
+        run: flutter pub get
+        
+      - name: Build app for web
+        run: flutter build web
