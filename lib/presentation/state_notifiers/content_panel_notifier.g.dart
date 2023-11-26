@@ -1,27 +1,27 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'list_containers.dart';
+part of 'content_panel_notifier.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$listContainersHash() => r'37e01d144f93ae78db00f0e9547811f22f3c4f78';
+String _$contentPanelNotifierHash() =>
+    r'5a8fb0ed9df9ca87220697c97c68093198fc317e';
 
-/// See also [listContainers].
-@ProviderFor(listContainers)
-final listContainersProvider = AutoDisposeFutureProvider<
-    (List<DockerContainer> running, List<DockerContainer> stopped)>.internal(
-  listContainers,
-  name: r'listContainersProvider',
+/// See also [ContentPanelNotifier].
+@ProviderFor(ContentPanelNotifier)
+final contentPanelNotifierProvider =
+    AutoDisposeNotifierProvider<ContentPanelNotifier, int>.internal(
+  ContentPanelNotifier.new,
+  name: r'contentPanelNotifierProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$listContainersHash,
+      : _$contentPanelNotifierHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef ListContainersRef = AutoDisposeFutureProviderRef<
-    (List<DockerContainer> running, List<DockerContainer> stopped)>;
+typedef _$ContentPanelNotifier = AutoDisposeNotifier<int>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

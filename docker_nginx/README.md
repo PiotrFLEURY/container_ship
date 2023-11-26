@@ -25,7 +25,7 @@ sudo docker build -t docker_nginx .
 ## Start container
 
 ```bash
-sudo docker run -p 80:80 -v /var/run:/var/run --rm -d docker_nginx
+sudo docker run -p 80:80 -v /var/run:/var/run --rm -d --name docker_nginx docker_nginx
 ```
 
 # Usage

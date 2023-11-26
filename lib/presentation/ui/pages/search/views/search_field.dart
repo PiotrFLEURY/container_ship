@@ -20,33 +20,31 @@ class _SearchFieldState extends State<SearchField> {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(48.0),
-      elevation: 4.0,
-      child: TextField(
-        controller: controller,
-        decoration: InputDecoration(
-          hintText: 'Search',
-          prefixIcon: const Icon(Icons.search),
-          suffixIcon: _empty
-              ? null
-              : IconButton(
-                  onPressed: _clearText,
-                  icon: const Icon(Icons.clear),
-                ),
-          border: InputBorder.none,
+    return TextField(
+      controller: controller,
+      decoration: InputDecoration(
+        fillColor: Colors.white,
+        hintText: 'Enter any docker image name',
+        //prefixIcon: const Icon(Icons.search),
+        suffixIcon: _empty
+            ? null
+            : IconButton(
+                onPressed: _clearText,
+                icon: const Icon(Icons.clear),
+              ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
         ),
-        style: const TextStyle(
-          color: Colors.black,
-        ),
-        onSubmitted: widget.onSubmitted,
-        onChanged: (value) {
-          setState(() {
-            _empty = value.isEmpty;
-          });
-        },
       ),
+      style: const TextStyle(
+        color: Colors.black,
+      ),
+      onSubmitted: widget.onSubmitted,
+      onChanged: (value) {
+        setState(() {
+          _empty = value.isEmpty;
+        });
+      },
     );
   }
 
